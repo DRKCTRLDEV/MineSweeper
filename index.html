@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Minesweeper</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+        
+        <!-- Chrome, Firefox OS and Opera -->
+        <meta name="theme-color" content="#ffdd00">
+        <!-- Windows Phone -->
+        <meta name="msapplication-navbutton-color" content="#ffdd00">
+        <!-- iOS Safari -->
+        <meta name="apple-mobile-web-app-status-bar-style" content="#ffdd00">
+
+        <meta property="og:url" content="http://derflatulator.github.io/minesweeper/" />
+        <meta property="og:title" content="Minesweeper" />
+        <meta property="og:description" content="Play minesweeper in your browser or on your phone." />
+        <meta name="description" content="Play minesweeper in your browser or on your phone.">
+        <meta name="keywords" content="Minesweeper,Browser,Phone,Touch,Game,Free">
+        <meta name="author" content="Lucas Azzola">
+        
+        <link rel="icon" href="img/favicon.ico" type="image/x-icon" />
+        
+        <!-- Add the link to the new CSS file -->
+        <link rel="stylesheet" href="styles.css">
+        
+        <!-- Add the Roboto font -->
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+        <script src="https://unpkg.com/knockout@3.5.1/build/output/knockout-latest.js"></script>
+        <script src="https://unpkg.com/lodash@4.17.21/lodash.min.js"></script>
+        <script type="module" src="build/minesweeper.js"></script>
+    </head>
+    <body>        
+        <header>
+            <h1>Minesweeper</h1>
+        </header>
+        
+        <section id="main" data-bind="template: { name: 'main-templ', data: $data }"><br />Loading...</section>
+
+        <script type="text/html" id="main-templ">    
+            <!-- ko ifnot: started -->
+                <h3>Select Difficulty</h3>
+                <div class="custom-dropdown">
+                    <div class="dropdown-selected" data-bind="text: selectedDifficulty().name + ' (' + selectedDifficulty().width() + 'x' + selectedDifficulty().height() + ')', 
+                                                            click: toggleDropdown"></div>
+                    <div class="dropdown-options">
+                        <!-- ko foreach: difficulties -->
+                        <!-- ko if: $data !== $parent.selectedDifficulty() -->
+                        <div class="dropdown-option" 
+                             data-bind="text: name + ' (' + width() + 'x' + height() + ')', 
+                                       click: $parent.selectDifficulty.bind($parent, $data)"></div>
+                        <!-- /ko -->
+                        <!-- /ko -->
+                    </div>
+                </div>
+                <!-- ko if: selectedDifficulty().name === 'Custom' -->
+                    <!-- ko with: selectedDifficulty -->
+                        <div class="options-container animate-slide">
+                            <h3>Custom Game Options</h3>
+                            <div class="option-row">
+                                <label for="width-input">Width:</label>
+                                <input id="width-input" type="range" min="5" max="45" step="1" data-bind="value: width, event: { input: updateWidthValue }">
+                                <span class="option-value" data-bind="text: width"></span>
+                            </div>
+                            <div class="option-row">
+                                <label for="height-input">Height:</label>
+                                <input id="height-input" type="range" min="5" max="45" step="1" data-bind="value: height, event: { input: updateHeightValue }">
+                                <span class="option-value" data-bind="text: height"></span>
+                            </div>
+                            <div class="option-row">
+                                <label for="mines-input">Number of Mines:</label>
+                                <input id="mines-input" type="range" min="2" data-bind="value: mines, attr: { max: maxMines }, event: { input: updateMinesValue }">
+                                <span class="option-value" data-bind="text: mines"></span>
+                            </div>
+                            <div class="option-info">Total cells: <span data-bind="text: +width() * +height()"></span></div>
+                            <div class="option-info">Mine coverage: <span data-bind="text: (100 * mines() / (+width() * +height())).toFixed(1)"></span>%</div>
+                        </div>
+                    <!-- /ko -->
+                <!-- /ko -->
+                <br />
+                <br />
+
+                <button id="start" data-bind="click: start" class="start-btn">Start Game</button>                
+            
+            <!-- /ko -->
+            <!-- ko if: started -->
+                <!-- ko with: grid -->
+                    <div class="status-info">
+                        <span>Flags: <span data-bind="text: difficulty.mines() - flagsRemaining()"></span>/<span data-bind="text: difficulty.mines"></span></span>
+                        <span>|</span>
+                        <span>Time: <span data-bind="text: timeString()"></span></span>
+                    </div>
+                    <main data-bind="foreach: cellRows">
+                    <div class="cell-row" data-bind="foreach: $data">
+                        <div class="cell" 
+                            data-bind="html: cellText,
+                                       css: cellCss,                                        
+                                       event: { contextmenu: flag, mousedown: suspense, mouseup: relief },                                       
+                                       click: reveal">
+                        </div>
+                    </div>
+                    </main>
+                    <br />
+                <!-- /ko -->
+            <!-- /ko -->
+        </script>
+
+        <footer id="links">
+            Built by <a target="_blank" href="https://github.com/azz">Azz</a>,
+            Themed+Updated by <a target="_blank" href="https://github.com/DRKCTRL">DRK</a>
+        </footer>
+            
+    </body>
+</html>
